@@ -26,7 +26,7 @@ function atualizarNotas(notas, sessao) {
     }
 }
 
-function adicionarNota(form, is_editar, index_editar) {
+function adicionarNota(form, index_editar) {
     console.log(form, is_editar, index_editar);
     console.dir(form);
     //criar variavel nota
@@ -35,25 +35,22 @@ function adicionarNota(form, is_editar, index_editar) {
         body: form.body.value,
         cor: form.cor.value
     };
-    console.log(nota, is_editar);
+
     //adicionar nota dentro da lista
-    if (is_editar) {
+    if (index_editar !== null) {
         is_editar = false;
         lista[index_editar] = nota;
-        atualizarNotas(lista, form.parentElement)
+        atualizarNotas(lista, form.parentElement);
     } else {
         lista.push(nota);
-        atualizarNotas(lista, form.nextElementSibling)
+        atualizarNotas(lista, form.nextElementSibling);
     }
     // limpar formulario   
     form.reset();
 }
 
 function onRemoveClick(sessao, index) {
-    console.log(lista);
-    console.log(sessao, index);
     lista.splice(index, 1);
-    console.log(lista);
     atualizarNotas(lista, sessao)
 }
 
