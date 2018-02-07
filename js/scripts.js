@@ -21,13 +21,13 @@ function atualizarNotas(notas, sessao) {
             '<input ' + cor + ' class="note__title" name="title" type="text" value="' + notas[c].titulo + '" disabled ></input>' +
             '<textarea  ' + cor + ' class="note__body" name="body" disabled>' + notas[c].body + '</textarea>' +
             '<input type="color" name="cor" value="' + notas[c].cor + '" class="oculto">'+
-            '<button class="note__control oculto" type="button" onclick="adicionarNota(this.form, true, '+c+')">Concluído</button>'+
+            '<button class="note__control oculto" type="button" onclick="adicionarNota(this.form, '+c+')">Concluído</button>'+
             '</form>';
     }
 }
 
 function adicionarNota(form, index_editar) {
-    console.log(form, is_editar, index_editar);
+    console.log(form, index_editar);
     console.dir(form);
     //criar variavel nota
     var nota = {
@@ -37,8 +37,7 @@ function adicionarNota(form, index_editar) {
     };
 
     //adicionar nota dentro da lista
-    if (index_editar !== null) {
-        is_editar = false;
+    if (index_editar !== null) {       
         lista[index_editar] = nota;
         atualizarNotas(lista, form.parentElement);
     } else {

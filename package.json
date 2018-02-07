@@ -12,7 +12,8 @@
   },
   "scripts": {
     "build": "babel js -d lib --watch",
-    "start": "webpack --config webpack.config.js --watch"
+    "start": "webpack --config webpack.config.js --watch",
+    "meu": "webpack --config webpackmeu.config.js --watch"
   },
   "repository": {
     "type": "git",

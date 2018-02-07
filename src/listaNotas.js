@@ -1,6 +1,5 @@
 import Nota from './nota.js';
 
-
 class ListaNotas {
     constructor(observador) {
         this._listaInterna = [];
