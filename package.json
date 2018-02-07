@@ -1,0 +1,27 @@
+{
+  "name": "post-it",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.1",
+    "webpack": "^3.10.0"
+  },
+  "scripts": {
+    "build": "babel js -d lib --watch",
+    "start": "webpack --config webpack.config.js --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/code-xp-front/post-it.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/code-xp-front/post-it/issues"
+  },
+  "homepage": "https://github.com/code-xp-front/post-it#readme"
+}
