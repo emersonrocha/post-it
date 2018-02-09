@@ -1,41 +1,93 @@
-import ListaNotas from './listaNotas.js';
-import FormNotas from './components/formNotas.js';
+import ListaNotas from './global/listaNotasMeu.js';
+import FormNota from './components/formNotaMeu.js';
 
-let secao = document.getElementsByClassName('notes')[0];
-const observaMudancasNaLista = () => {
-    atualizarSecao(secao);
-};
+//Rescrevendo todo o javascript separando em componentes e itens do componente, 
+//criar todo o html via javascript.
 
-const listaNotas = new ListaNotas(observaMudancasNaLista);
+//usada como espelho da secao e armazena as edições no localstorage
+var lista = localStorage.getItem("notasNovas") ? JSON.parse(localStorage.getItem("notas")) : [];
 
-const atualizarSecao = secao => {
+var listaNotas = new ListaNotas(atualizador)
 
+function atualizador(){
+    atualizarNotas(lista, document.getElementById("secao-notas"))
+}
+
+console.log(lista);
+
+if (lista.length > 0) {
+    atualizarNotas(lista, document.getElementById("secao-notas"))
+}
+
+function atualizarNotas(notas, secao) {
+    localStorage.setItem("notasNovas", JSON.stringify(notas));      
+
+     // Enquanto existir um primeiro filho remover ele, isso exclui todos os filhos da secao
     while (secao.firstChild) {
         secao.removeChild(secao.firstChild);
     }
 
-    for (let posicao = 0; posicao < listaNotas.contaTotal(); posicao++) {
-        let notaAtual = listaNotas.pega(posicao);   
-
+     // Obtem o tamanho do array e cria um form para percorer todo ele.
+    for (let c = 0; c < listaNotas.total(); c++) {
+        let notaAtual = listaNotas.pega(c);   
         // property shorthand
-        const props = { posicao, notaAtual, editarFormulario, adicionarNota, removerNota };
-        secao.appendChild(new FormNotas(props));
+        // https://developer.mozilla.org/pt-BR/docs/Web/CSS/Shorthand_properties
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer
+        
+        const props = { 
+            c, 
+            notaAtual, 
+            editarNotaLocal, 
+            adicionarNota, 
+            onRemoveClick 
+        };
+        secao.appendChild(new FormNota(props));
     }
-    // secao.innerHTML = conteudoSecao;
 }
 
-window.editarFormulario = posicao => listaNotas.edita(posicao);
+function adicionarNota(form, index_editar) {
+    console.log(form, index_editar);
+    console.dir(form);     
 
-window.adicionarNota = (inputTitulo, textareaTexto, formulario, posicao) => {
-    if (listaNotas.pega(posicao)) {
-        listaNotas.salva(posicao, inputTitulo.value, textareaTexto.value);
+    var nota = {
+        titulo: form.title.value,
+        body: form.body.value,
+        cor: form.cor.value,        
+    };
+
+    //adicionar nota dentro na lista
+    if (index_editar !== null) {   
+        //Se já tem substitui a que existe    
+        //lista[index_editar] = nota;
+        listaNotas.substitui(index_editar, form.title.value, form.body.value, form.cor.value, index_editar)
+        atualizarNotas(lista, form.parentElement);
     } else {
-        listaNotas.adiciona(inputTitulo.value, textareaTexto.value);
-        formulario.reset();
+        //Se não tem adiciona no final        
+        //lista.push(nota);   
+        listaNotas.adiciona(form.title.value, form.body.value, form.cor.value, listaNotas.total())
+        atualizarNotas(lista, form.nextElementSibling);
     }
+    // limpar formulario   
+    form.reset();
 }
 
-window.removerNota = (evento, posicao) => {
-    evento.stopPropagation();
-    listaNotas.remove(posicao);
+function onRemoveClick(secao, index) {
+    lista.splice(index, 1);
+    atualizarNotas(lista, secao)
 }
+
+function editarNota(index, form) {    
+    form.title.value = lista[index].titulo;
+    form.body.value = lista[index].body;
+    form.cor.value = lista[index].cor; 
+    notaEditando = index;   
+}
+
+function editarNotaLocal(index, form){    
+    form.cor.className = "";
+    form.lastChild.className = "note__control";
+    form.title.disabled = false;
+    form.body.disabled = false;        
+}
+
+window.adicionarNota = adicionarNota;

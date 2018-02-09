@@ -70,24 +70,36 @@
 "use strict";
 
 
-var _listaNotas = __webpack_require__(1);
+var _listaNotasMeu = __webpack_require__(1);
 
-var _listaNotas2 = _interopRequireDefault(_listaNotas);
+var _listaNotasMeu2 = _interopRequireDefault(_listaNotasMeu);
 
-var _formNotas = __webpack_require__(3);
+var _formNotaMeu = __webpack_require__(4);
 
-var _formNotas2 = _interopRequireDefault(_formNotas);
+var _formNotaMeu2 = _interopRequireDefault(_formNotaMeu);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var secao = document.getElementsByClassName('notes')[0];
-var observaMudancasNaLista = function observaMudancasNaLista() {
-    atualizarSecao(secao);
-};
+//Rescrevendo todo o javascript separando em componentes e itens do componente, 
+//criar todo o html via javascript.
 
-var listaNotas = new _listaNotas2.default(observaMudancasNaLista);
+//usada como espelho da secao e armazena as edições no localstorage
+var lista = localStorage.getItem("notasNovas") ? JSON.parse(localStorage.getItem("notas")) : [];
 
-var atualizarSecao = function atualizarSecao(secao) {
+var listaNotas = new _listaNotasMeu2.default(atualizador);
+
+function atualizador() {
+    atualizarNotas(lista, document.getElementById("secao-notas"));
+}
+
+console.log(lista);
+
+if (lista.length > 0) {
+    atualizarNotas(lista, document.getElementById("secao-notas"));
+}
+
+function atualizarNotas(notas, secao) {
+    localStorage.setItem("notasNovas", JSON.stringify(notas));
 
     // Enquanto existir um primeiro filho remover ele, isso exclui todos os filhos da secao
     while (secao.firstChild) {
@@ -95,39 +107,67 @@ var atualizarSecao = function atualizarSecao(secao) {
     }
 
     // Obtem o tamanho do array e cria um form para percorer todo ele.
-    for (var posicao = 0; posicao < listaNotas.contaTotal(); posicao++) {
-        var notaAtual = listaNotas.pega(posicao);
-
+    for (var c = 0; c < listaNotas.total(); c++) {
+        var notaAtual = listaNotas.pega(c);
         // property shorthand
+        // https://developer.mozilla.org/pt-BR/docs/Web/CSS/Shorthand_properties
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer
+
         var props = {
-            posicao: posicao,
+            c: c,
             notaAtual: notaAtual,
-            editarFormulario: editarFormulario,
+            editarNotaLocal: editarNotaLocal,
             adicionarNota: adicionarNota,
-            removerNota: removerNota
+            onRemoveClick: onRemoveClick
         };
-
-        secao.appendChild(new _formNotas2.default(props));
+        secao.appendChild(new _formNotaMeu2.default(props));
     }
-};
+}
 
-var editarFormulario = function editarFormulario(posicao) {
-    return listaNotas.edita(posicao);
-};
+function adicionarNota(form, index_editar) {
+    console.log(form, index_editar);
+    console.dir(form);
 
-var adicionarNota = function adicionarNota(inputTitulo, textareaTexto, formulario, posicao) {
-    if (listaNotas.pega(posicao)) {
-        listaNotas.salva(posicao, inputTitulo.value, textareaTexto.value);
+    var nota = {
+        titulo: form.title.value,
+        body: form.body.value,
+        cor: form.cor.value
+    };
+
+    //adicionar nota dentro na lista
+    if (index_editar !== null) {
+        //Se já tem substitui a que existe    
+        //lista[index_editar] = nota;
+        listaNotas.substitui(index_editar, form.title.value, form.body.value, form.cor.value, index_editar);
+        atualizarNotas(lista, form.parentElement);
     } else {
-        listaNotas.adiciona(inputTitulo.value, textareaTexto.value);
-        formulario.reset();
+        //Se não tem adiciona no final        
+        //lista.push(nota);   
+        listaNotas.adiciona(form.title.value, form.body.value, form.cor.value, listaNotas.total());
+        atualizarNotas(lista, form.nextElementSibling);
     }
-};
+    // limpar formulario   
+    form.reset();
+}
 
-var removerNota = function removerNota(evento, posicao) {
-    evento.stopPropagation();
-    listaNotas.remove(posicao);
-};
+function onRemoveClick(secao, index) {
+    lista.splice(index, 1);
+    atualizarNotas(lista, secao);
+}
+
+function editarNota(index, form) {
+    form.title.value = lista[index].titulo;
+    form.body.value = lista[index].body;
+    form.cor.value = lista[index].cor;
+    notaEditando = index;
+}
+
+function editarNotaLocal(index, form) {
+    form.cor.className = "";
+    form.lastChild.className = "note__control";
+    form.title.disabled = false;
+    form.body.disabled = false;
+}
 
 window.adicionarNota = adicionarNota;
 
@@ -144,13 +184,15 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _nota = __webpack_require__(2);
+var _notaMeu = __webpack_require__(2);
 
-var _nota2 = _interopRequireDefault(_nota);
+var _notaMeu2 = _interopRequireDefault(_notaMeu);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+//observador >> função é para rodar o atualiza secao quando algum item for alterado.
 
 var ListaNotas = function () {
     function ListaNotas(observador) {
@@ -162,21 +204,39 @@ var ListaNotas = function () {
 
     _createClass(ListaNotas, [{
         key: 'adiciona',
-        value: function adiciona(novoTitulo, novoTexto) {
-            var nota = new _nota2.default(novoTitulo, novoTexto);
+        value: function adiciona(novoTitulo, novoTexto, novaCor, posicao) {
+            var nota = new _notaMeu2.default(novoTitulo, novoTexto, novaCor, posicao);
             this._listaInterna.push(nota);
             this._observador();
         }
     }, {
-        key: 'remove',
-        value: function remove(posicao, quantidade) {
+        key: 'removeUma',
+        value: function removeUma(posicao) {
             this._listaInterna.splice(posicao, 1);
+            this._observador();
+        }
+    }, {
+        key: 'removeVarias',
+        value: function removeVarias(posicao, quantidade) {
+            this._listaInterna.splice(posicao, quantidade);
             this._observador();
         }
     }, {
         key: 'edita',
         value: function edita(posicao) {
             this._listaInterna[posicao].editando = true;
+            this._observador();
+        }
+    }, {
+        key: 'substitui',
+        value: function substitui(posicao, nota) {
+            this._listaInterna[posicao] = new _notaMeu2.default(nota);
+            this._observador();
+        }
+    }, {
+        key: 'substitui',
+        value: function substitui(posicao, novoTitulo, novoTexto, novaCor, posicaoNota) {
+            this._listaInterna[posicao] = new _notaMeu2.default(novoTitulo, novoTexto, novaCor, posicaoNota);
             this._observador();
         }
     }, {
@@ -193,8 +253,8 @@ var ListaNotas = function () {
             return this._listaInterna[posicao];
         }
     }, {
-        key: 'contaTotal',
-        value: function contaTotal() {
+        key: 'total',
+        value: function total() {
             return this._listaInterna.length;
         }
     }]);
@@ -222,12 +282,13 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Nota = function () {
-    function Nota(novoTitulo, novoTexto) {
+    function Nota(novoTitulo, novoTexto, novaCor, posicao) {
         _classCallCheck(this, Nota);
 
         this._titulo = novoTitulo;
         this._texto = novoTexto;
-        this._editando = false;
+        this._cor = novaCor;
+        this._posicao = posicao;
     }
 
     _createClass(Nota, [{
@@ -247,12 +308,20 @@ var Nota = function () {
             this._texto = novoTexto;
         }
     }, {
-        key: "editando",
+        key: "cor",
         get: function get() {
-            return this._editando;
+            return this._cor;
         },
-        set: function set(novoEditando) {
-            this._editando = novoEditando;
+        set: function set(novaCor) {
+            this._cor = novaCor;
+        }
+    }, {
+        key: "posicao",
+        get: function get() {
+            return this._posicao;
+        },
+        set: function set(posicao) {
+            this._posicao = posicao;
         }
     }]);
 
@@ -262,7 +331,8 @@ var Nota = function () {
 exports.default = Nota;
 
 /***/ }),
-/* 3 */
+/* 3 */,
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -272,15 +342,15 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _form = __webpack_require__(4);
+var _form = __webpack_require__(5);
 
 var _form2 = _interopRequireDefault(_form);
 
-var _formInput = __webpack_require__(5);
+var _formInput = __webpack_require__(6);
 
 var _formInput2 = _interopRequireDefault(_formInput);
 
-var _formTextarea = __webpack_require__(6);
+var _formTextarea = __webpack_require__(8);
 
 var _formTextarea2 = _interopRequireDefault(_formTextarea);
 
@@ -302,8 +372,8 @@ function FormNotas(props) {
         type: 'text',
         name: 'titulo',
         placeholder: 'Título',
-        readonly: !props.notaAtual.editando,
-        value: props.notaAtual.titulo
+        disabled: !props.nota.editando,
+        value: props.nota.titulo
     });
 
     var textareaTexto = new _formTextarea2.default({
@@ -311,14 +381,14 @@ function FormNotas(props) {
         name: 'texto',
         placeholder: 'Criar uma nota...',
         rows: 5,
-        readonly: !props.notaAtual.editando,
-        children: props.notaAtual.texto
+        disabled: !props.nota.editando,
+        children: props.nota.texto
     });
 
     var children = void 0;
     var click = void 0;
 
-    if (props.notaAtual.editando) {
+    if (props.nota.editando) {
         var buttonRemover = new _formButton2.default({
             className: 'note__control',
             type: 'button',
@@ -358,7 +428,7 @@ function FormNotas(props) {
 exports.default = FormNotas;
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -389,7 +459,7 @@ function Form(props) {
 exports.default = Form;
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -420,7 +490,33 @@ function FormInput(props) {
 exports.default = FormInput;
 
 /***/ }),
-/* 6 */
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+// props param
+function FormButton(props) {
+    var formButton = document.createElement('button');
+
+    // destructuring
+    formButton.setAttribute('class', props.className);
+    formButton.setAttribute('type', props.type);
+    formButton.addEventListener('click', props.click);
+
+    formButton.innerHTML = props.children;
+
+    return formButton;
+}
+
+exports.default = FormButton;
+
+/***/ }),
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -450,32 +546,6 @@ function FormTextarea(props) {
 }
 
 exports.default = FormTextarea;
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-// props param
-function FormButton(props) {
-    var formButton = document.createElement('button');
-
-    // destructuring
-    formButton.setAttribute('class', props.className);
-    formButton.setAttribute('type', props.type);
-    formButton.addEventListener('click', props.click);
-
-    formButton.innerHTML = props.children;
-
-    return formButton;
-}
-
-exports.default = FormButton;
 
 /***/ })
 /******/ ]);

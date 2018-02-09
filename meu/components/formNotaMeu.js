@@ -15,8 +15,8 @@ function FormNotas(props) {
         type: 'text',
         name: 'titulo',
         placeholder: 'Título',
-        readonly: !props.notaAtual.editando,
-        value: props.notaAtual.titulo
+        disabled: !props.nota.editando,
+        value: props.nota.titulo
     });
     
     let textareaTexto = new FormTextarea({
@@ -24,14 +24,14 @@ function FormNotas(props) {
         name: 'texto', 
         placeholder: 'Criar uma nota...', 
         rows: 5, 
-        readonly: !props.notaAtual.editando,
-        children: props.notaAtual.texto
+        disabled: !props.nota.editando,
+        children: props.nota.texto
     });
     
     let children;
     let click;
 
-    if (props.notaAtual.editando) {
+    if (props.nota.editando) {
         let buttonRemover = new FormButton({
             className: 'note__control', 
             type: 'button', 

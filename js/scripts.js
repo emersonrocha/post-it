@@ -1,19 +1,20 @@
 var lista = localStorage.getItem("notas") ? JSON.parse(localStorage.getItem("notas")) : [];
+var notaEditando = false;
 
 document.oncontextmenu = new Function ("return false");
 console.dir(document);
 
 if (lista.length > 0) {
-    atualizarNotas(lista, document.getElementById("sessao-notas"))
+    atualizarNotas(lista, document.getElementById("secao-notas"))
 }
 
 //https://nettuts.s3.amazonaws.com/771_sticky/step5.html
-function atualizarNotas(notas, sessao) {
+function atualizarNotas(notas, secao) {
     localStorage.setItem("notas", JSON.stringify(notas));
-    sessao.innerHTML = '';
+    secao.innerHTML = '';
     for (var c = 0; c < notas.length; c++) {
         var cor = style = 'style="background-color:' + notas[c].cor + ';"'
-        sessao.innerHTML +=
+        secao.innerHTML +=
             '<form class="note" ' + cor + ' ondblclick="editarNota(' + c + ', this.parentElement.previousElementSibling)" oncontextmenu="editarNotaLocal(' + c + ', this)">' +
             '<button ' + cor + ' class="note__control" type="button" onclick="onRemoveClick(this.form.parentElement, ' + c + ')">' +
             '<i class="fa fa-times" aria-hidden="true"></i>' +
@@ -27,36 +28,44 @@ function atualizarNotas(notas, sessao) {
 }
 
 function adicionarNota(form, index_editar) {
-    console.log(form, index_editar);
-    console.dir(form);
-    //criar variavel nota
+    console.log(form, index_editar, notaEditando);
+    console.dir(form);     
+
     var nota = {
         titulo: form.title.value,
         body: form.body.value,
         cor: form.cor.value
     };
 
-    //adicionar nota dentro da lista
-    if (index_editar !== null) {       
+    //adicionar nota dentro na lista
+    if (index_editar !== null) {   
+        //Se já tem substitui a que existe    
         lista[index_editar] = nota;
         atualizarNotas(lista, form.parentElement);
     } else {
-        lista.push(nota);
+        //Se não tem adiciona no final
+        if(notaEditando !== false){
+            lista[notaEditando] = nota
+        }else{
+            lista.push(nota);
+        }
+        notaEditando = false;
         atualizarNotas(lista, form.nextElementSibling);
     }
     // limpar formulario   
     form.reset();
 }
 
-function onRemoveClick(sessao, index) {
+function onRemoveClick(secao, index) {
     lista.splice(index, 1);
-    atualizarNotas(lista, sessao)
+    atualizarNotas(lista, secao)
 }
 
 function editarNota(index, form) {    
     form.title.value = lista[index].titulo;
-    form.body.value = lista[index].body
-    form.cor.value = lista[index].cor    
+    form.body.value = lista[index].body;
+    form.cor.value = lista[index].cor; 
+    notaEditando = index;   
 }
 
 function editarNotaLocal(index, form){    

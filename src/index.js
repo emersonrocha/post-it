@@ -9,10 +9,13 @@ const observaMudancasNaLista = () => {
 const listaNotas = new ListaNotas(observaMudancasNaLista);
 
 const atualizarSecao = secao => {
+    
+    // Enquanto existir um primeiro filho remover ele, isso exclui todos os filhos da secao
     while (secao.firstChild) {
         secao.removeChild(secao.firstChild);
     }
 
+    // Obtem o tamanho do array e cria um form para percorer todo ele.
     for (let posicao = 0; posicao < listaNotas.contaTotal(); posicao++) {
         let notaAtual = listaNotas.pega(posicao);
 
