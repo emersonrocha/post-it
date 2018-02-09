@@ -29,14 +29,14 @@ function atualizarNotas(notas, secao) {
 
      // Obtem o tamanho do array e cria um form para percorer todo ele.
     for (let c = 0; c < listaNotas.total(); c++) {
-        let notaAtual = listaNotas.pega(c);   
+        let nota = listaNotas.pega(c);   
         // property shorthand
         // https://developer.mozilla.org/pt-BR/docs/Web/CSS/Shorthand_properties
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer
-        
+
         const props = { 
-            c, 
-            notaAtual, 
+            possicao: c, 
+            nota, 
             editarNotaLocal, 
             adicionarNota, 
             onRemoveClick 
@@ -89,5 +89,7 @@ function editarNotaLocal(index, form){
     form.title.disabled = false;
     form.body.disabled = false;        
 }
+
+const editarFormulario = posicao => listaNotas.edita(posicao);
 
 window.adicionarNota = adicionarNota;
